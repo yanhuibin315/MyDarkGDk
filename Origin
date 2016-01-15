@@ -1,0 +1,37 @@
+#include"DarkGDK.h"
+void DarkGDK()
+{
+	dbSetWindowTitle("The Orion Constellation");
+	dbCenterText(319,20,"Stars of the Constellation");
+
+	dbDot(200,100);
+	dbDot(350,120);
+	dbDot(260,280);
+	dbDot(320,240);
+	dbDot(220,380);
+	dbDot(380,360);
+
+	dbCenterText(319,450,"Press any key to continue");
+	dbWaitKey();
+
+	dbCenterText(319,40,"Star Name");
+	dbCenterText(200,100,"Betelguese");
+	dbCenterText(350,120,"Meissa");
+	dbText(260,280,"Alnitak");
+	dbText(290,260,"Alnilam");
+	dbText(320,240,"Mintake");
+	dbCenterText(220,380,"Saigh");
+	dbCenterText(380,360,"Rigel");
+
+	dbWaitKey();
+
+	dbCenterText(319,60,"Constellation Lines");
+	dbLine(200,100,260,280);
+	dbLine(350,120,320,240);
+	dbLine(260,280,290,260);
+	dbLine(290,260,320,240);
+	dbLine(260,280,220,380);
+	dbLine(320,240,380,360);
+
+	dbWaitKey();
+}
