@@ -1,0 +1,65 @@
+#include"DarkGDK.h"
+void setup();
+DWORD randomcolor();
+int getmaximumx();
+int getmaximumy();
+
+void DarkGDK()
+{
+	int x,y;
+	const int size=50;
+	const DWORD black=dbRGB(255,0,255);
+	int upperx,uppery,lowerx,lowery;
+	DWORD color;
+	setup();
+	while(LoopGDK())
+	{
+		color=randomcolor();
+		upperx=dbRND(getmaximumx()-size);
+		uppery=dbRND(getmaximumy()-size);
+		lowerx=upperx+size;
+		lowery=uppery+size;
+		dbInk(color,black);
+		dbBox(upperx,uppery,lowerx,lowery);
+		dbSync();
+
+		/*
+		x=dbRND(getmaximumx());
+		y=dbRND(getmaximumy());
+		dbDot(x,y);
+		dbSync();
+		*/
+	}
+}
+
+void setup()
+{
+	const int refresh_rate=60;
+	dbRandomize(dbTimer());
+	dbSyncOn();
+	dbSyncRate(refresh_rate);
+
+}
+
+DWORD randomcolor()
+{
+	const int max_color=255;
+	int red=dbRND(max_color);
+	int green=dbRND(max_color);
+	int blue=dbRND(max_color);
+	DWORD color=(red,green,blue);
+	return color;
+
+}
+
+
+
+int getmaximumx()
+{
+	return dbScreenWidth()-1;
+}
+
+int getmaximumy()
+{
+	return dbScreenHeight()-1;
+}
