@@ -1,0 +1,70 @@
+#include"DarkGDK.h"
+#include<string.h>
+
+void getInput(char[],char[],char[],char[]);
+void displayStory(char[],char[],char[],char[]);
+
+void DarkGDK()
+{
+	const int word_size=30;
+
+	char year[word_size];
+	char college[word_size];
+	char food[word_size];
+	char emotion[word_size];
+
+	getInput(year,college,food,emotion);
+
+	displayStory(year,college,food,emotion);
+
+	dbPrint("Press any key to exit");
+	dbWaitKey();
+
+}
+
+void getInput(char year[],char college[],char food[],char emotion[])
+{
+	dbPrint("Enter a year(for example,2001):");
+	strcpy(year,dbInput());
+
+	dbPrint("Enter the name of the college:");
+	strcpy(college,dbInput());
+
+	dbPrint("Enter the name of youe favorite food:");
+	strcpy(food,dbInput());
+
+	dbPrint("Enter a name of an emotion:");
+	strcpy(emotion,dbInput());
+}
+
+void displayStory(char year[],char college[],char food[],char emotion[])
+{
+	const int line_size=80;
+
+	char line1[line_size];
+	char line2[line_size];
+	char line3[line_size];
+	
+	strcpy(line1,"In ");
+	strcat(line1,year);
+	strcat(line1," I graduated from ");
+	strcat(line1,college);
+	strcat(line1,".");
+
+	strcpy(line2,"I quickly went to work in a ");
+	strcat(line2,food);
+	strcat(line2,"factory.");
+
+	strcpy(line3,"This made my parents very ");
+	strcat(line3,emotion);
+	strcat(line3,"!");
+
+	dbPrint();
+	dbPrint("Here is your story:");
+	dbPrint("------------------");
+	dbPrint(line1);
+	dbPrint(line2);
+	dbPrint(line3);
+	dbPrint();
+
+}
