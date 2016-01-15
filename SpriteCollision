@@ -1,0 +1,58 @@
+#include"DarkGDK.h"
+const int ball1_image_num=1;
+const int ball2_image_num=2;
+const int ball1_sprite_num=1;
+const int ball2_sprite_num=2;
+const int ball1_x=0;
+const int ball2_x=511;
+const int ball_y=175;
+const int distance=10;
+const int refresh_rate=10;
+void setup();
+void movebowlingballs();
+void detectcollision();
+
+void DarkGDK()
+{
+	setup();
+	while(LoopGDK())
+	{
+		movebowlingballs();
+		detectcollision();
+		dbSync();
+	}
+}
+
+void setup()
+{
+	dbSetImageColorKey(0,255,0);
+	
+	dbLoadImage("BowlingBall1.bmp",ball1_image_num);
+	dbLoadImage("BowlingBall2.bmp",ball2_image_num);
+
+	dbSprite(ball1_sprite_num,ball1_x,ball_y,ball1_image_num);
+	dbSprite(ball2_sprite_num,ball2_x,ball_y,ball2_image_num);
+
+	dbSyncOn();
+	dbSyncRate(refresh_rate);
+}
+
+void movebowlingballs()
+{
+	int x;
+	x=dbSpriteX(ball1_sprite_num);
+	x+=distance;
+	dbSprite(ball1_sprite_num,x,ball_y,ball1_image_num);
+	x=dbSpriteX(ball2_sprite_num);
+	x-=distance;
+	dbSprite(ball2_sprite_num,x,ball_y,ball2_image_num);
+}
+
+void detectcollision()
+{
+	if(dbSpriteCollision(ball1_sprite_num,ball2_sprite_num))
+	{
+		dbSprite(ball1_sprite_num,ball1_x,ball_y,ball1_image_num);
+		dbSprite(ball2_sprite_num,ball2_x,ball_y,ball2_image_num);
+	}
+}
