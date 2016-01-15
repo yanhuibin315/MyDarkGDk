@@ -1,0 +1,12 @@
+#include"DarkGDK.h"
+void DarkGDK()
+{
+	int x=319,y=239;
+	for(int radius=50;radius<=200;radius+=50)
+		dbCircle(x,y,radius);
+	dbLine(0,239,639,239);
+	dbLine(319,0,319,479);
+	dbLine(0,0,639,479);
+	dbLine(639,0,0,479);
+	dbWaitKey();
+}
