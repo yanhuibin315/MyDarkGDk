@@ -1,0 +1,94 @@
+#include"DarkGDK.h"
+
+const int robot_image_num=1;
+const int robot_sprite_num=1;
+const int robot_cols=3;
+const int robot_rows=1;
+const int start_frame=1;
+const int end_frame=3;
+const int robot_x=500;
+const int robot_y=350;
+const int robot_move=10;
+const int delay=200;
+const int pizza_image_num=2;
+const int pizza_sprite_num=2;
+const int yum_image_num=3;
+const int refresh_rate=30;
+
+void setup();
+void updateRobot();
+void detectCollision();
+void showYum();
+void generatePizza();
+
+void DarkGDK()
+{
+	setup();
+	while(LoopGDK())
+	{
+		updateRobot();
+		detectCollision();
+		dbSync();
+
+	}
+}
+
+void setup()
+{
+	dbRandomize(dbTimer());
+	dbSetImageColorKey(0,255,0);
+	dbCreateAnimatedSprite(robot_sprite_num,"Robot.bmp",robot_cols,robot_rows,robot_image_num);
+	dbPlaySprite(robot_sprite_num,start_frame,end_frame,delay);
+	dbSprite(robot_sprite_num,robot_x,robot_y,robot_image_num);
+	dbLoadImage("Pizza.bmp",pizza_image_num);
+	generatePizza();
+	dbLoadImage("Yum.bmp",yum_image_num);
+	dbSyncOn();
+	dbSyncRate(30);
+}
+
+void updateRobot()
+{
+	int x=dbSpriteX(robot_sprite_num);
+	int y=dbSpriteY(robot_sprite_num);
+	if(dbUpKey())
+		y-=robot_move;
+	if(dbDownKey())
+		y+=robot_move;
+	if(dbLeftKey())
+		x-=robot_move;
+	if(dbRightKey())
+		x+=robot_move;
+	dbPlaySprite(robot_sprite_num,start_frame,end_frame,delay);
+	dbSprite(robot_sprite_num,x,y,robot_image_num);
+}
+
+void detectCollision()
+{
+	if(dbSpriteCollision(robot_sprite_num,pizza_sprite_num))
+	{
+		showYum();
+		generatePizza();
+	}
+}
+
+void showYum()
+{
+	int x=dbSpriteX(pizza_sprite_num);
+	int y=dbSpriteY(pizza_sprite_num);
+	dbSyncOff();
+	dbSprite(pizza_sprite_num,x,y,yum_image_num);
+	dbWait(delay);
+	dbSyncOn();
+}
+
+void generatePizza()
+{
+	int screenWidth=dbScreenWidth();
+	int screenHeight=dbScreenHeight();
+	int maxX=screenWidth-dbSpriteWidth(pizza_image_num);
+	int maxY=screenHeight-dbSpriteHeight(pizza_image_num);
+	int x=dbRND(maxX);
+	int y=dbRND(maxY);
+	dbSprite(pizza_sprite_num,x,y,pizza_image_num);
+}
