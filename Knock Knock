@@ -1,0 +1,28 @@
+#include"DarkGDK.h"
+void DarkGDK()
+{
+	dbCenterText(319,10,"Knock Knock");
+	dbWait(2000);
+
+	dbCenterText(319,40,"Who's there?");
+	dbWait(2000);
+
+	dbCenterText(319,70,"Boo");
+	dbWait(2000);
+
+	dbCenterText(319,100,"Boo who?");
+	dbWait(2000);
+
+	
+	dbBox(318,110,320,111);
+	dbWait(1000);
+	dbBox(318,115,320,116);
+	dbWait(1000);
+	dbBox(318,120,320,121);
+	dbWait(1000);
+
+	dbCenterText(319,130,"Don't cry!");
+	dbCenterText(319,160,"I promise to stop telling");
+	dbCenterText(319,190,"corny jokes");
+	dbWaitKey();
+}
