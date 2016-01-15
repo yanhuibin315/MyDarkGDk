@@ -1,0 +1,34 @@
+#include"DarkGDK.h"
+void DarkGDK()
+{
+	int centerX;
+	int centerY;
+	int radius;
+	int maxRadius=100;
+	int screenWidth;
+	int screenHeigh;
+	int seed;
+
+	seed=dbTimer();
+	dbRandomize(seed);
+
+	screenWidth=dbScreenWidth();
+	screenHeigh=dbScreenHeight();
+
+	centerX=dbRND(screenWidth);
+	centerY=dbRND(screenHeigh);
+	radius=dbRND(maxRadius);
+	dbCircle(centerX,centerY,radius);
+
+	centerX=dbRND(screenWidth);
+	centerY=dbRND(screenHeigh);
+	radius=dbRND(maxRadius);
+	dbCircle(centerX,centerY,radius);
+
+	centerX=dbRND(screenWidth);
+	centerY=dbRND(screenHeigh);
+	radius=dbRND(maxRadius);
+	dbCircle(centerX,centerY,radius);
+
+	dbWaitKey();
+}
