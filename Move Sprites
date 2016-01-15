@@ -1,0 +1,63 @@
+#include"DarkGDK.h"
+void createSprites();
+void getUfocoordinates(int &,int&);
+void updateufo(float &,int &);
+
+
+void DarkGDK()
+{
+	int ufox=400,ufoy=100;
+	float ufoAngle=0.0;
+	int alpha=200;
+	dbSetWindowTitle("UFO Coming");
+	dbClear(0,0,0);
+
+	dbSetImageColorKey(0,255,0);
+	dbLoadImage("space.bmp",1);
+	dbLoadImage("ufo.bmp",2);
+	dbSprite(1,0,0,1);
+	dbSprite(2,ufox,ufoy,2);
+
+	dbOffsetSprite(2,64,64);
+
+	dbSyncOn();
+	dbSyncRate(60);
+
+	while(LoopGDK())
+	{
+		dbPasteSprite(2,ufox-100,ufoy+50);
+		//getUfocoordinates(ufox,ufoy);
+		updateufo(ufoAngle,alpha);
+		dbSprite(2,ufox,ufoy,2);
+		dbSync();
+	}
+
+	dbWaitKey();
+
+}
+
+void updateufo(float &angle,int &alpha)
+{
+	if(dbLeftKey())
+		dbSetSpriteAlpha(2,alpha++);
+	if(dbRightKey())
+		dbSetSpriteAlpha(2,alpha--);
+
+	if(dbUpKey())
+		angle+=10;
+	if(dbDownKey())
+		angle-=5;
+	dbRotateSprite(2,angle);
+}
+
+void getUfocoordinates(int &x,int&y)
+{
+	if(dbUpKey())
+		y--;
+	if(dbDownKey())
+		y++;
+	if(dbLeftKey())
+		x--;
+	if(dbRightKey())
+		x++;
+}
