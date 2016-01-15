@@ -1,0 +1,147 @@
+#include"DarkGDK.h"
+
+void generateRandom(int [],int);
+void setText();
+void displayRandom(int [],int);
+void getUserNumbers(int [],int);
+void displayResults(int [],int [],int);
+int matchingNumbers(int [],int [],int);
+void displayArray(int,int,int [],int);
+
+void DarkGDK()
+{
+	const int size=5;
+
+	int random[size];
+	int user[size];
+
+	generateRandom(random,size);
+
+	setText();
+	displayRandom(random,size);
+	getUserNumbers(user,size);
+	displayResults(random,user,size);
+	dbWaitKey();
+}
+
+void generateRandom(int numbers[],int size)
+{
+	dbRandomize(dbTimer());
+	for(int index=0;index<size;index++)
+		numbers[index]=dbRnd(20);
+}
+
+void setText()
+{
+	dbSetTextFont("Arial");
+	dbSetTextSize(36);
+}
+void displayRandom(int numbers[],int size)
+{
+	const int delay=150;
+	int textHeight=dbTextHeight("0");
+
+	int x=dbScreenWidth()/2;
+	int y=dbScreenHeight()/2-textHeight/2;
+
+	dbCLS();
+	dbCenterText(x,y,"Press any key and observe the numbers");
+	dbWaitKey();
+	dbCLS();
+
+	for(int index=0;index<size;index++)
+	{
+		dbCenterText(x,y,dbStr(numbers[index]));
+		dbWait(delay);
+		dbCLS();
+		dbWait(delay);
+	}
+}
+void getUserNumbers(int numbers[],int size)
+{
+	int textHeight=dbTextHeight("0");
+
+	int x=dbScreenWidth()/2;
+	int y=80;
+
+	dbCLS();
+	dbCenterText(x,y,"Now it's your turn");
+	dbCenterText(x,y+30,"Input the same numbers ,pressing");
+	dbCenterText(x,y+60,"Enter after each");
+	dbCenterText(x,y+120,"press any key to begin...");
+	dbWaitKey();
+	dbCLS();
+
+	int textWidth=dbTextWidth("0");
+
+	x=(dbScreenWidth()/2)-(textWidth/2);
+	y=(dbScreenHeight()/2)-textHeight/2;
+
+	for(int index=0;index<size;index++)
+	{
+		dbSetCursor(x,y);//???????//
+		numbers[index]=atoi(dbInput());
+		dbCLS();
+	}
+}
+
+void displayResults(int random[],int user[],int size)
+{
+	const int line_1_x=dbScreenWidth()/2;
+	const int line_1_y=40;
+
+	const int line_2_x=200;
+	const int line_2_y=80;
+
+	const int line_3_x=dbScreenWidth()/2;
+	const int line_3_y=140;
+
+	const int line_4_x=200;
+	const int line_4_y=180;
+
+	const int line_5_x=dbScreenWidth()/2;
+	const int line_5_y=240;
+
+	const int line_6_x=dbScreenWidth()/2;
+	const int line_6_y=280;
+	const int line_7_x=dbScreenWidth()/2;
+	const int line_7_y=340;
+
+	int matches=matchingNumbers(random,user,size);
+
+	dbCLS();
+
+	dbCenterText(line_1_x,line_1_y,"Here are the computer's number:");
+	displayArray(line_2_x,line_2_y,random,size);
+
+	dbCenterText(line_3_x,line_3_y,"Here are your number:");
+	displayArray(line_4_x,line_4_y,user,size);
+	dbCenterText(line_5_x,line_5_y,"Correct Matches:");
+	dbCenterText(line_6_x,line_6_y,dbStr(matches));
+
+	if(matches==size)
+	{
+		dbCenterText(line_7_x,line_7_y,"Perfect Match!");
+	}
+}
+
+int matchingNumbers(int random[],int user[],int size)
+{
+	int matches=0;
+	for(int index=0;index<size;index++)
+	{
+		if(random[index]==user[index])
+			matches++;
+	}
+	return matches;
+}
+
+void displayArray(int x,int y,int numbers[],int size)
+{
+	int charWidth=dbTextWidth("0");
+	for(int index=0;index<size;index++)
+	{
+		dbText(x,y,dbStr(numbers[index]));
+		x=x+(charWidth*3);
+	}
+}
