@@ -1,0 +1,7 @@
+#include"DarkGDK.h"
+void DarkGDK()
+{
+	dbPrint("This is my first Program!");
+	dbWaitKey();
+
+}
