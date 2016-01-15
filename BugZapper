@@ -1,0 +1,183 @@
+#include"DarkGDK.h"
+
+const int pointer_image=1;
+const int bug_image=2;
+const int intro_image=3;
+const int grass_image=4;
+const int pointer_sprite=1;
+const int bug_sprite=2;
+const int offset_x=13;
+const int offset_y=0;
+const int rows=1;
+const int cols=2;
+const int delay=500;
+const int max_time=10000;
+const int refresh_rate=60;
+
+void setup();
+void displayintro();
+void initmouse();
+void initbug();
+void updatemouse();
+void updatebug();
+void generatenewbug();
+int elapsedtime(int);
+void displaybugszapped(int);
+bool mousefullclick(int &,int &);
+bool onsprite(int,int,int);
+
+void DarkGDK()
+{
+	int mousex,mousey;
+	int bugszapped=0;
+	bool stillplaying=true;
+	setup();
+	int starttime(dbTimer());
+
+	while(LoopGDK()&&stillplaying)
+	{
+		dbPasteImage(grass_image,0,0);
+		updatemouse();
+		updatebug();
+		if(mousefullclick(mousex,mousey))
+		{
+			if(onsprite(bug_sprite,mousex,mousey))
+			{
+				bugszapped++;
+				generatenewbug();
+			}
+		}
+
+		if(elapsedtime(starttime)>max_time)
+		{
+			stillplaying=false;
+			displaybugszapped(bugszapped);
+		}
+		dbSync();
+	}
+}
+
+void setup()
+{
+	displayintro();
+	dbRandomize(dbTimer());
+	dbSetImageColorKey(0,255,0);
+	initmouse();
+	initbug();
+	dbLoadImage("Grass.bmp",grass_image);
+
+	dbSyncOn();
+	dbSyncRate(refresh_rate);
+}
+
+void displayintro()
+{
+	dbLoadImage("Intro.bmp",intro_image);
+	dbPasteImage(intro_image,0,0);
+
+	dbWaitKey();
+}
+
+void initmouse()
+{
+	dbHideMouse();
+
+	int centerx=dbScreenWidth()/2;
+	int centery=dbScreenHeight()/2;
+
+	dbPositionMouse(centerx,centery);
+	dbLoadImage("HandPointer.bmp",pointer_image);
+
+	dbSprite(pointer_sprite,centerx,centery,pointer_image);
+	dbOffsetSprite(pointer_sprite,offset_x,offset_y);
+
+	dbSetSpritePriority(pointer_sprite,1);
+}
+void initbug()
+{
+	dbCreateAnimatedSprite(bug_sprite,"ShinyBug.bmp",cols,rows,bug_image);
+	dbSetSpritePriority(bug_sprite,0);
+	generatenewbug();
+}
+void updatemouse()
+{
+	int mousex=dbMouseX();
+	int mousey=dbMouseY();
+
+	dbSprite(pointer_sprite,mousex,mousey,pointer_image);
+}
+
+void updatebug()
+{
+	int bugx=dbSpriteX(bug_sprite);
+	int bugy=dbSpriteY(bug_sprite);
+
+	dbPlaySprite(bug_sprite,rows,cols,delay);
+	dbSprite(bug_sprite,bugx,bugy,bug_image);
+}
+
+void generatenewbug()
+{
+	int screenwidth=dbScreenWidth();
+	int screenheight=dbScreenHeight();
+
+	int bugwidth=dbSpriteWidth(bug_sprite);
+	int bugheight=dbSpriteHeight(bug_sprite);
+
+	int x=dbRnd(screenwidth-bugwidth);
+	int y=dbRnd(screenheight-bugheight);
+
+	dbSprite(bug_sprite,x,y,bug_image);
+}
+int elapsedtime(int starttime)
+{
+	return dbTimer()-starttime;
+}
+void displaybugszapped(int bugs)
+{
+	int centerx=dbScreenWidth()/2;
+	int centery=dbScreenHeight()/2;
+
+	dbSyncOff();
+
+	dbDeleteSprite(bug_sprite);
+	dbDeleteSprite(pointer_sprite);
+
+	dbCLS();
+	dbCenterText(centerx,centery,"Number of bugs zapped:");
+	dbCenterText(centerx,centery+20,dbStr(bugs));
+	dbCenterText(centerx,centery+40,"Press any key....");
+
+	dbWaitKey();
+
+	dbSyncOn();
+}
+bool mousefullclick(int &x,int &y)
+{
+	bool buttonclick=false;
+
+	if(dbMouseClick()==1)
+	{
+		x=dbMouseX();
+		y=dbMouseY();
+
+		while(dbMouseClick()==1)
+		{}
+		buttonclick=true;
+	}
+	return buttonclick;
+}
+
+bool onsprite(int spritenum,int pointx,int pointy)
+{
+	bool insidesprite;
+	int upperx=dbSpriteX(spritenum)-dbSpriteOffsetX(spritenum);
+	int uppery=dbSpriteY(spritenum)-dbSpriteOffsetY(spritenum);
+	int lowerx=upperx+dbSpriteWidth(spritenum);
+	int lowery=uppery+dbSpriteHeight(spritenum);
+	if(pointx>=upperx&&pointy>=uppery&&pointx<=lowerx&&pointy<=lowery)
+		insidesprite=true;
+	else
+		insidesprite=false;
+	return insidesprite;
+}
