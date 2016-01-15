@@ -1,0 +1,311 @@
+#include"DarkGDK.h"
+
+const int title_screen_image=1;
+const int intro_screen_image=2;
+const int egg_image=3;
+const int broken_egg_image=4;
+const int farm_image=5;
+const int basket_image=6;
+const int hit_basket_image=7;
+const int vulture_image=8;
+
+const int farm_sprite=1;
+const int basket_sprite=2;
+const int egg_sprite=3;
+const int hit_basket_sprite=4;
+const int broken_egg_sprite=5;
+const int vulture_sprite=6;
+
+const int vulture_cols=4;
+const int vulture_rows=2;
+const int start_frame=1;
+const int end_frame=8;
+
+const int pop_sound=1;
+const int clap_sound=2;
+const int type_sound=3;
+const int complete_sound=4;
+const int perfect_score_scound=5;
+
+const int intro_music=1;
+const int main_music=2;
+
+const int tenth_second=100;
+const int one_second=1000;
+const int four_second=4000;
+
+const int max_eggs=10;
+const int basket_move=4;
+const int vulture_move=2;
+const float acceleration=0.5;
+const int refresh_rate=60;
+
+void loadResources();
+void intro();
+void createSprites(int &,int &,int &,int&,int &,int &);
+void moveBasket(int &);
+void moveVulture(int &);
+void moveEgg(int ,int ,int &,int &,int &);
+void checkCollision(int ,int &,int &,int &,int &,int &);
+void showHitBasket();
+void showBrokenEgg();
+void resetEgg(int ,int ,int &);
+void render(int ,int ,int ,int ,int ,int );
+void summaryScreen(int ,int );
+void deleteSprites();
+
+void DarkGDK()
+{
+	int eggs=max_eggs;
+	int caught=0;
+	int broken=0;
+	int basketx,baskety;
+	int vulturex,vulturey;
+	int eggx,eggy;
+	int time=0;
+
+	loadResources();
+	intro();
+	createSprites(basketx,baskety,eggx,eggy,vulturex,vulturey);
+	while(LoopGDK()&&eggs>0)
+	{
+		moveBasket(basketx);
+		moveVulture(vulturex);
+		moveEgg(vulturex,vulturey,eggx,eggy,time);
+		checkCollision(vulturey,eggy,caught,broken,eggs,time);
+		render(basketx,baskety,eggx,eggy,vulturex,vulturey);
+	}
+	summaryScreen(caught,broken);
+}
+
+void loadResources()
+{
+	dbSetImageColorKey(0,255,0);
+
+	dbLoadImage("titleScreen.bmp",title_screen_image);
+	dbLoadImage("intro.bmp",intro_screen_image);
+	dbLoadImage("farm.bmp",farm_image);
+	dbLoadImage("egg.bmp",egg_image);
+	dbLoadImage("brokenEgg.bmp",broken_egg_image);
+	dbLoadImage("basket.bmp",basket_image);
+	dbLoadImage("hitBasket.bmp",hit_basket_image);
+
+	dbLoadMusic("vultureTrouble.mp3",intro_music);
+	dbLoadMusic("vultureLevel.mp3",main_music);
+
+	dbLoadSound("pop.wav",pop_sound);
+	dbLoadSound("clap.wav",clap_sound);
+	dbLoadSound("type.wav",type_sound);
+	dbLoadSound("complete.wav",complete_sound);
+	dbLoadSound("vulturePerfect.wav",perfect_score_scound);
+}
+
+void intro()
+{
+	dbSetWindowTitle("Vulture Trouble");
+
+	dbLoopMusic(intro_music);
+
+	dbPasteImage(title_screen_image,0,0);
+	dbWaitKey();
+
+	dbCLS();
+
+	dbPasteImage(intro_screen_image,0,0);
+	dbWaitKey();
+
+	dbStopMusic(intro_music);
+	
+	dbSyncOn();
+	dbSyncRate(refresh_rate);
+}
+
+void createSprites(int &basketx,int &baskety,int &eggx,int&eggy,int &vulturex,int &vulturey)
+{
+	int spriteNum;
+
+	dbSprite(farm_sprite,0,0,farm_image);
+	dbSprite(basket_sprite,0,0,basket_image);
+	dbSprite(egg_sprite,0,0,egg_image);
+	dbSprite(hit_basket_sprite,0,0,hit_basket_image);
+	dbSprite(broken_egg_sprite,0,0,broken_egg_image);
+
+	dbHideSprite(hit_basket_sprite);
+	dbHideSprite(broken_egg_sprite);
+
+	dbCreateAnimatedSprite(vulture_sprite,"vulture.bmp",vulture_cols,vulture_rows,vulture_image);
+	
+	vulturex=dbScreenWidth()/2-dbSpriteWidth(vulture_sprite)/2;
+	vulturey=0;
+
+	eggx=vulturex+dbSpriteWidth(vulture_sprite)-dbSpriteWidth(egg_sprite);
+	eggy=vulturey+dbSpriteHeight(vulture_sprite)/2;
+
+	dbRandomize(dbTimer());
+	basketx=dbRND(dbScreenWidth()-dbSpriteWidth(basket_sprite));
+	baskety=dbScreenHeight()-dbSpriteHeight(basket_sprite);
+
+	for(int count=0;count<max_eggs;count++)
+	{
+		spriteNum=100+count;
+		dbCloneSprite(egg_sprite,spriteNum);
+		dbScaleSprite(spriteNum,50);
+		dbSprite(spriteNum,dbSpriteWidth(egg_sprite)/2*count,0,egg_image);
+	}
+}
+
+void moveBasket(int &basketx)
+{
+	if(dbLeftKey())
+	{
+		if(basketx<=0)
+			basketx=0;
+		else
+			basketx-=basket_move;
+	}
+	if(dbRightKey())
+	{
+		if(basketx+dbSpriteWidth(basket_sprite)>=dbScreenWidth())
+			basketx=dbScreenWidth()-dbSpriteWidth(basket_sprite);
+		else
+			basketx+=basket_move;
+	}
+}
+
+void moveVulture(int &vulturex)
+{
+	dbPlaySprite(vulture_sprite,start_frame,end_frame,tenth_second);
+
+	if(vulturex<=0)
+		dbMirrorSprite(vulture_sprite);
+	if(vulturex+dbSpriteWidth(vulture_sprite)>=dbScreenWidth())
+		dbMirrorSprite(vulture_sprite);
+	if(dbSpriteMirrored(vulture_sprite))
+		vulturex+=vulture_move;
+	else
+		vulturex-=vulture_move;
+}
+
+void moveEgg(int vulturex,int vulturey,int &eggx,int &eggy,int &time)
+{
+	float distance;
+	if(dbSpriteMirrored(vulture_sprite))
+		eggx=vulturex+dbSpriteWidth(vulture_sprite)-dbSpriteWidth(egg_sprite);
+	else
+		eggx=vulturex;
+
+	distance=0.5*acceleration*time*time;
+	eggy=distance+vulturey+dbSpriteHeight(vulture_sprite)/2;
+	time++;
+}
+
+void checkCollision(int vulturey,int &eggy,int &caught,int &broken,int &eggs,int &time)
+{
+	if(dbSpriteCollision(egg_sprite,basket_sprite))
+	{
+		caught++;
+		eggs--;
+		showHitBasket();
+		resetEgg(eggs,vulturey,eggy);
+		time=0;
+	}
+	else if(eggy>dbScreenHeight())
+	{
+		broken++;
+		eggs--;
+		showBrokenEgg();
+		resetEgg(eggs,vulturey,eggy);
+		time=0;
+	}
+}
+
+void showHitBasket()
+{
+	dbSyncOff();
+	dbShowSprite(hit_basket_sprite);
+	dbPlaySound(pop_sound);
+	dbWait(tenth_second);
+	dbHideSprite(hit_basket_sprite);
+	dbSyncOn();
+}
+
+void showBrokenEgg()
+{
+	dbSyncOff();
+	dbShowSprite(broken_egg_sprite);
+	dbPlaySound(clap_sound);
+	dbWait(tenth_second);
+	dbHideSprite(broken_egg_sprite);
+	dbSyncOn();
+}
+
+void resetEgg(int eggs,int vulturey,int &eggy)
+{
+	if(dbSpriteExist(eggs+100))
+		dbDeleteSprite(eggs+100);
+	dbWait(tenth_second);
+	eggy=vulturey+dbSpriteHeight(vulture_sprite)/2;
+}
+
+void render(int basketx,int baskety,int eggx,int eggy,int vulturex,int vulturey)
+{
+	dbSprite(basket_sprite,basketx,baskety,basket_image);
+	dbSprite(egg_sprite,eggx,eggy,egg_image);
+	dbSprite(hit_basket_sprite,basketx,baskety,hit_basket_image);
+	dbSprite(broken_egg_sprite,eggx,dbScreenHeight()-dbSpriteHeight(broken_egg_sprite),broken_egg_image);
+	dbSprite(vulture_sprite,vulturex,vulturey,vulture_image);
+
+	dbSync();
+}
+
+void summaryScreen(int caught,int broken)
+{
+	deleteSprites();
+
+	dbSyncOff();
+	dbCLS();
+
+	dbSetTextSize(36);
+	dbSetTextFont("Freestyle Script");
+	dbCenterText(dbScreenWidth()/2,100,"GAME OVER");
+
+	dbPlaySound(complete_sound);
+	dbWait(four_second);
+
+	for(int caughtCount=0;caughtCount<=caught;caughtCount++)
+	{
+		dbCLS();
+		dbPasteImage(egg_image,200,240);
+		dbPasteImage(broken_egg_image,300,240);
+
+		dbCenterText(dbScreenWidth()/2,100,"GAME OVER");
+		dbText(240,240,"x");
+		dbText(380,240,"x");
+		dbText(260,240,dbStr(caughtCount));
+		dbText(400,240,dbStr(broken));
+
+		dbPlaySound(type_sound);
+		dbWait(tenth_second);
+
+		dbCenterText(dbScreenWidth()/2,400,dbStr(caughtCount*1000));
+
+		if(caughtCount==max_eggs)
+		{
+			dbCenterText(dbScreenWidth()/2,200,"PERFECT SCORE");
+			dbPlaySound(perfect_score_scound);
+			dbWait(one_second);
+		}
+		
+	}
+	dbWaitKey();
+}
+
+void deleteSprites()
+{
+		dbDeleteSprite(farm_sprite);
+		dbDeleteSprite(basket_sprite);
+		dbDeleteSprite(egg_sprite);
+		dbDeleteSprite(hit_basket_sprite);
+		dbDeleteSprite(broken_egg_sprite);
+		dbDeleteSprite(vulture_sprite);
+}
